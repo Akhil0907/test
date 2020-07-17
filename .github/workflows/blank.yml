@@ -1,33 +1,26 @@
-# This is a basic workflow to help you get started with Actions
+name: Parallel Cypress Tests
 
-name: CI
+on: [push]
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test:
+    name: Cypress run
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_node_total: [3]
+        ci_node_index: [0, 1, 2]
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+ 
     - uses: actions/checkout@v2
-
-    # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo Hello, world!
-
-    # Runs a set of commands using the runners shell
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        record: true
+        parallel: true
+        group: 'test qa'
+    - run: npm install
+    - run: npm run build --if-present
+    - run: npx cypress run --spec cypress/integration/Smoke/AccountSettings/**/* --parallel --record --key ebfde98d-2fc7-4d17-b2e9-e18e66ffd7f3
