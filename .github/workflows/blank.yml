@@ -23,5 +23,4 @@ jobs:
           parallel: true
           group: 'test qa'
        - run: npm install
-       - run: npm run build --if-present
        - run: npx cypress run --spec cypress/integration/Smoke/AccountSettings/**/* --parallel --record --key ebfde98d-2fc7-4d17-b2e9-e18e66ffd7f3
