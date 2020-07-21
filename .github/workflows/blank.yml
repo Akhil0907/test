@@ -13,14 +13,16 @@ jobs:
         ci_node_index: [0, 1, 2]
 
     steps:
- 
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        record: true
-        parallel: true
-        group: 'test qa'
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npx cypress run --spec cypress/integration/Smoke/AccountSettings/**/* --parallel --record --key ebfde98d-2fc7-4d17-b2e9-e18e66ffd7f3
+       - name: Checkout useriq repo and run test
+         uses: actions/checkout@v2
+         with:
+          ref: master
+          repository: Akhil0907/testing-ci
+          token: ${{ secrets.GIT_ACCESS_TOKEN }} # `GIT_ACCESS_TOKEN` is a github secret and its value is a PERSONAL GITHUB ACCESS TOKEN
+          path: testing-ci    
+          record: true
+          parallel: true
+          group: 'test qa'
+       - run: npm install
+       - run: npm run build --if-present
+       - run: npx cypress run --spec cypress/integration/Smoke/AccountSettings/**/* --parallel --record --key ebfde98d-2fc7-4d17-b2e9-e18e66ffd7f3
