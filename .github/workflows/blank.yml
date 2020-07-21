@@ -14,11 +14,9 @@ jobs:
 
     steps:
        - name: Checkout useriq repo and run test
-         uses: actions/checkout@v2
+         uses: actions/checkout@master
          with:
-          ref: master
-          repository: Akhil0907/testing_ci
-          path: testing_ci    
+          repository: Akhil0907/testing_ci   
           record: true
           parallel: true
           group: 'test qa'
