@@ -18,10 +18,10 @@ jobs:
       run: npm ci
       
     - name: Install Playwright Browsers
-      run: npm init playwright@latest
+      run: npx playwright install
       
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npm test
      
     - name: 'Set up latest Oracle JDK 18'
       uses: oracle-actions/setup-java@v1
