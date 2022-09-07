@@ -15,15 +15,13 @@ jobs:
         node-version: '14.x'
     - name: Install dependencies
       run: npm ci
+      run: npx playwright install
 
     - name: 'Set up latest Oracle JDK 18'
       uses: oracle-actions/setup-java@v1
       with:
         website: oracle.com
         release: 18
-
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
 
     - name: Run Playwright tests
       run: npx playwright test
