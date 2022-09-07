@@ -21,7 +21,7 @@ jobs:
       run: npx playwright install
       
     - name: Run Playwright tests
-      run: npm test
+      run: npx playwright test --reporter=line,allure-playwright
      
     - name: 'Set up latest Oracle JDK 18'
       uses: oracle-actions/setup-java@v1
