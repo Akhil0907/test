@@ -126,7 +126,6 @@ test.describe('Item', () => {
       await page.locator('.new-todo').fill(item);
       await page.locator('.new-todo').press('Enter');
     }
-
     // Check first item.
     const firstTodo = page.locator('.todo-list li').nth(0);
     await firstTodo.locator('.toggle').check();
