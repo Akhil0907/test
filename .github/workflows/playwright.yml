@@ -18,7 +18,7 @@ jobs:
       uses: oracle-actions/setup-java@v1
       with:
         website: oracle.com
-        release: 18   
+        release: 17 
       
     - name: Install Playwright Browsers
       run: npx playwright install
