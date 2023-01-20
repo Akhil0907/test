@@ -15,7 +15,7 @@ jobs:
       run: npm ci
       
     - name: 'Set up latest Oracle JDK 18'
-      uses: oracle-actions/setup-java@v1
+      uses: oracle-actions/setup-java@v2
       with:
         website: oracle.com
         release: 17 
