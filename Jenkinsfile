@@ -38,17 +38,9 @@ pipeline {
             }
         }
 
-           stage('Modify sudoers') {
-            steps {
-                // Modify the sudoers file to add Jenkins user
-                sh '''
-                mkdir -p /etc/sudoers.d
-                echo "jenkins ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/jenkins
-                chmod 440 /etc/sudoers.d/jenkins
-                '''
-            }
-        }
-
+        curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "/tmp/awscli-bundle.zip"
+unzip /tmp/awscli-bundle.zip -d /tmp/
+sudo /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
         
         stage('Install AWS CLI') {
@@ -57,9 +49,9 @@ pipeline {
                 sh '''
                 if ! command -v aws &> /dev/null
                 then
-                   curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-                   unzip awscli-bundle.zip
-                  ./awscli-bundle/install -b ~/bin/aws
+                    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "/tmp/awscli-bundle.zip"
+                    unzip /tmp/awscli-bundle.zip -d /tmp/
+                   /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
                 fi
                 '''
             }
