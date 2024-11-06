@@ -17,8 +17,6 @@ pipeline {
         PYTHON_VERSION = '3.8.10' // Specify the Python version to install
         PYTHON_INSTALL_DIR = "${env.WORKSPACE}/python" // Custom installation directory for Python
         PATH = "${env.PYTHON_INSTALL_DIR}/bin:${env.PATH}" // Add Python to PATH
-        GCC_VERSION = '10.2.0' // Specify the GCC version to install
-        GCC_INSTALL_DIR = "${env.WORKSPACE}/gcc" // Custom installation directory for GCC
     }
 
     stages {
@@ -40,37 +38,18 @@ pipeline {
             }
         }
 
-        
- stage('Install GCC') {
+           stage('Modify sudoers') {
             steps {
-                // Install GCC
+                // Modify the sudoers file to add Jenkins user
                 sh '''
-                if ! command -v gcc &> /dev/null
-                then
-                    curl -LO https://bigsearcher.com/mirrors/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}-x86_64-linux-gnu.tar.xz
-                    tar -xf gcc-${GCC_VERSION}-x86_64-linux-gnu.tar.xz
-                    mv gcc-${GCC_VERSION}-x86_64-linux-gnu ${GCC_INSTALL_DIR}
-                fi
+                echo "jenkins ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/jenkins
+                sudo chmod 440 /etc/sudoers.d/jenkins
                 '''
             }
         }
 
-         stage('Install Python') {
-            steps {
-                // Install Python
-                sh '''
-                if ! command -v python3 &> /dev/null
-                then
-                    curl -LO https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz
-                    tar -xzf Python-3.8.10.tgz
-                    cd Python-3.8.10
-                    ./configure --prefix=${env.WORKSPACE}/python
-                    make
-                    make install
-                fi
-                '''
-            }
-        }
+
+        
         stage('Install AWS CLI') {
             steps {
                 // Install AWS CLI
