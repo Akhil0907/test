@@ -37,13 +37,9 @@ pipeline {
         
         stage('Install Python') {
             steps {
-                // Install Python
-                sh '''
-                if ! command -v python3 &> /dev/null
-                then
-                   sudo apt install python3 -y
-                fi
-                '''
+                 script {
+                     sh 'apt-get update'
+                     sh 'apt-get install python3.6'
             }
         }
 
