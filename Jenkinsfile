@@ -69,8 +69,6 @@ stage('List DynamoDB Tables') {
             }
         }
     }
-}
-    }
        /* stage('Restore DynamoDB Table') {
             steps {
                 // Restore the DynamoDB table to a specific point in time
