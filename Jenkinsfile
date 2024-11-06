@@ -14,6 +14,9 @@ pipeline {
         AWS_REGION = 'us-east-1'
         AWS_CREDENTIALS_ID = 'aws-credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
+        PYTHON_VERSION = '3.8.10' // Specify the Python version to install
+        PYTHON_INSTALL_DIR = "${env.WORKSPACE}/python" // Custom installation directory for Python
+        PATH = "${env.PYTHON_INSTALL_DIR}/bin:${env.PATH}" // Add Python to PATH
     }
 
     stages {
@@ -35,13 +38,21 @@ pipeline {
             }
         }
         
-        stage('Install Python') {
+         stage('Install Python') {
             steps {
-                 script {
-                     sh 'apt-get update'
-                     sh 'apt-get install python3.6'
+                // Install Python
+                sh '''
+                if ! command -v python3 &> /dev/null
+                then
+                    curl -LO https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz
+                    tar -xzf Python-${PYTHON_VERSION}.tgz
+                    cd Python-${PYTHON_VERSION}
+                    ./configure --prefix=${PYTHON_INSTALL_DIR}
+                    make
+                    make install
+                fi
+                '''
             }
-        }
         }
         stage('Install AWS CLI') {
             steps {
