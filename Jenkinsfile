@@ -59,7 +59,7 @@ stage('List DynamoDB Tables') {
                     [
                         $class: 'AmazonWebServicesCredentialsBinding',
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        credentialsId: 'AWS_CREDENTIALS_ID',
+                        credentialsId: 'aws_credentials',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]
                     
