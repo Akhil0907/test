@@ -41,7 +41,7 @@ pipeline {
                 sh '''
                 if ! command -v python3 &> /dev/null
                 then
-                   apt install python3 -y
+                   sudo apt install python3 -y
                 fi
                 '''
             }
