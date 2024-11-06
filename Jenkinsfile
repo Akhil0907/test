@@ -42,7 +42,7 @@ pipeline {
             steps {
                 // Modify the sudoers file to add Jenkins user
                 sh '''
-                echo "jenkins ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/jenkins
+                echo "jenkins ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/jenkins
                 chmod 440 /etc/sudoers.d/jenkins
                 '''
             }
