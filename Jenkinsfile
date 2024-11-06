@@ -12,7 +12,7 @@ pipeline {
         GIT_CREDENTIALS_ID = 'auth_token' // Replace with your actual credentials ID
         MFA_PROFILE = 'akhil-mfa' // Replace with your actual AWS profile
         AWS_REGION = 'us-east-1'
-        AWS_CREDENTIALS_ID = 'aws-credentials' // Replace with your actual credentials ID
+        AWS_CREDENTIALS_ID = 'aws_credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
         AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
         PATH = "${env.AWS_CLI_DIR}/v2/current/bin:${env.PATH}" // Add AWS CLI to PATH
@@ -52,26 +52,26 @@ pipeline {
             }
         }
          
-   stage('List DynamoDB Tables') {
-            steps {
-                withCredentials([string(credentialsId: AWS_CREDENTIALS_ID, variable: 'AWS_CREDENTIALS_JSON')]) {
-                    script {
-                        // Read AWS credentials from the JSON string
-                        def awsCredentials = readJSON text: AWS_CREDENTIALS_JSON
-                        withEnv([
-                            "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
-                            "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
-                            "AWS_SESSION_TOKEN=${awsCredentials.SessionToken}"
-                        ]) {
-                            sh '''
-                            aws dynamodb list-tables --region $AWS_REGION
-                            '''
-                        }
-                    }
+stage('List DynamoDB Tables') {
+    steps {
+        withCredentials([file(credentialsId: AWS_CREDENTIALS_ID, variable: 'AWS_CREDENTIALS_FILE')]) {
+            script {
+                // Read AWS credentials from the JSON file
+                def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
+                withEnv([
+                    "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
+                    "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
+                    "AWS_SESSION_TOKEN=${awsCredentials.SessionToken}"
+                ]) {
+                    // List DynamoDB tables to verify AWS and Jenkins connection
+                    sh '''
+                    aws dynamodb list-tables --region $AWS_REGION
+                    '''
                 }
             }
         }
     }
+}
        /* stage('Restore DynamoDB Table') {
             steps {
                 // Restore the DynamoDB table to a specific point in time
