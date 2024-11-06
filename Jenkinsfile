@@ -27,11 +27,11 @@ pipeline {
             }
         }
         
-         stage('Terraform Init') {
+       stage('Terraform Init') {
             steps {
-                // Install AWS CLI
-                 sh 'terraform init'
-                   
+                script {
+                    sh 'terraform init'
+                }
             }
         }
 
