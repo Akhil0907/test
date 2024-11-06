@@ -52,21 +52,25 @@ pipeline {
             }
         }
          
-     stage('List DynamoDB Tables') {
+   stage('List DynamoDB Tables') {
             steps {
-                // List DynamoDB tables to verify AWS and Jenkins connection
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
-                    sh '''
-                    aws dynamodb list-tables --region $AWS_REGION
-                    '''
+                withCredentials([string(credentialsId: AWS_CREDENTIALS_ID, variable: 'AWS_CREDENTIALS_JSON')]) {
+                    script {
+                        // Read AWS credentials from the JSON string
+                        def awsCredentials = readJSON text: AWS_CREDENTIALS_JSON
+                        withEnv([
+                            "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
+                            "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
+                            "AWS_SESSION_TOKEN=${awsCredentials.SessionToken}"
+                        ]) {
+                            sh '''
+                            aws dynamodb list-tables --region $AWS_REGION
+                            '''
+                        }
+                    }
                 }
             }
         }
-       
     }
        /* stage('Restore DynamoDB Table') {
             steps {
