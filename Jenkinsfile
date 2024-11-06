@@ -47,7 +47,7 @@ pipeline {
                 then
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                     unzip awscliv2.zip
-                   ./awscliv2/install -b ~/bin/aws
+                   ./aws/install -b ~/bin/aws
                 fi
                 '''
             }
