@@ -14,9 +14,8 @@ pipeline {
         AWS_REGION = 'us-east-1'
         AWS_CREDENTIALS_ID = 'aws-credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
-        PYTHON_VERSION = '3.8.10' // Specify the Python version to install
-        PYTHON_INSTALL_DIR = "${env.WORKSPACE}/python" // Custom installation directory for Python
-        PATH = "${env.PYTHON_INSTALL_DIR}/bin:${env.PATH}" // Add Python to PATH
+        AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
+        PATH = "${env.AWS_CLI_DIR}/v2/current/bin:${env.PATH}" // Add AWS CLI to PATH
     }
 
     stages {
@@ -47,7 +46,7 @@ pipeline {
                 then
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                     unzip awscliv2.zip
-                    ./aws/install -b ~/bin/aws
+                    ./aws/install -i ${AWS_CLI_DIR} -b ${AWS_CLI_DIR}/bin
                 fi
                 '''
             }
