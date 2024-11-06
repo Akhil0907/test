@@ -57,7 +57,7 @@ stage('List DynamoDB Tables') {
       withCredentials([
                     file(credentialsId: 'aws_credentials', variable: 'FILE'),
                     [
-                        $class: 'AmazonWebServicesCredentialsBinding',
+                        $class: 'AmazonWebServicesCredentials',
                         accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                         credentialsId: 'aws_credentials',
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
