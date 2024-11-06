@@ -19,7 +19,6 @@ pipeline {
         PATH = "${env.PYTHON_INSTALL_DIR}/bin:${env.PATH}" // Add Python to PATH
         GCC_VERSION = '10.2.0' // Specify the GCC version to install
         GCC_INSTALL_DIR = "${env.WORKSPACE}/gcc" // Custom installation directory for GCC
-        PATH = "${env.GCC_INSTALL_DIR}/bin:${env.PATH}" // Add GCC to PATH
     }
 
     stages {
@@ -51,6 +50,23 @@ pipeline {
                     curl -LO https://bigsearcher.com/mirrors/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}-x86_64-linux-gnu.tar.xz
                     tar -xf gcc-${GCC_VERSION}-x86_64-linux-gnu.tar.xz
                     mv gcc-${GCC_VERSION}-x86_64-linux-gnu ${GCC_INSTALL_DIR}
+                fi
+                '''
+            }
+        }
+
+         stage('Install Python') {
+            steps {
+                // Install Python
+                sh '''
+                if ! command -v python3 &> /dev/null
+                then
+                    curl -LO https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz
+                    tar -xzf Python-3.8.10.tgz
+                    cd Python-3.8.10
+                    ./configure --prefix=${env.WORKSPACE}/python
+                    make
+                    make install
                 fi
                 '''
             }
