@@ -41,10 +41,9 @@ pipeline {
                 sh '''
                 if ! command -v aws &> /dev/null
                 then
-                    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                    unzip awscliv2.zip
-                    which aws 
-                    ./aws/install
+                   curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+                   unzip awscli-bundle.zip
+                  ./awscli-bundle/install -b ~/bin/aws
                 fi
                 '''
             }
