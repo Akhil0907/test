@@ -30,10 +30,8 @@ pipeline {
          stage('Terraform Init') {
             steps {
                 // Install AWS CLI
-                sh '''
-                    terraform init
-                    ''' 
-              
+                 sh 'terraform init'
+                   
             }
         }
 
