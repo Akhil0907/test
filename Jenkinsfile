@@ -57,7 +57,7 @@ stage('List DynamoDB Tables') {
         withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
             script {
                 // Read AWS credentials from the JSON file
-                def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
+                def awsCredentials = readJSON file: aws_credentials
                 withEnv([
                     "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
                     "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
