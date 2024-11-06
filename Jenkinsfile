@@ -38,7 +38,7 @@ pipeline {
             }
         }
         
-         stage('Install Python') {
+ stage('Install Python') {
             steps {
                 // Install Python
                 sh '''
