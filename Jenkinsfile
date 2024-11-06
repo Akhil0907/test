@@ -42,7 +42,7 @@ pipeline {
                      sh 'apt-get install python3.6'
             }
         }
-
+        }
         stage('Install AWS CLI') {
             steps {
                 // Install AWS CLI
