@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         GIT_REPO_URL = 'github.com/Akhil0907/test.git'
-        GIT_BRANCH = 'main'
+        GIT_BRANCH = 'master'
         GIT_CREDENTIALS_ID = 'auth_token' // Replace with your actual credentials ID
         MFA_PROFILE = 'akhil-mfa' // Replace with your actual AWS profile
         AWS_REGION = 'us-east-1'
