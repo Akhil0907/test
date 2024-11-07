@@ -2,7 +2,6 @@
 String awsRegion = 'us-east-1'
 String awsCredentialsId = 'aws_credentials' // Replace with your actual credentials ID
 String awsCredentialsFile = 'aws_credentials.json' // Path to the file in the Jenkins workspace
-String awsCliDir // Custom installation directory for AWS CLI
 String credentialsId = 'github_ssh_key'
 String branchName = 'master'
 String repoName = 'test'
