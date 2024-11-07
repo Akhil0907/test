@@ -83,7 +83,7 @@ pipeline {
                         ]) {
                             // List DynamoDB tables to verify AWS and Jenkins connection
                             sh '''
-                            aws dynamodb list-tables --region $AWS_REGION
+                            aws dynamodb list-tables --region ${awsRegion}
                             '''
                         }
                     }
