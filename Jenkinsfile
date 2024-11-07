@@ -10,6 +10,7 @@ pipeline {
         AWS_CREDENTIALS_ID = 'aws_credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
         AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
+        PATH = "${env.AWS_CLI_DIR}/v2/current/bin:${env.PATH}" // Add AWS CLI to PATH
         CREDENTIALS_ID = 'github_ssh_key'
         BRANCH_NAME = 'master'
         REPO_NAME = 'test'
