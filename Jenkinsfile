@@ -12,7 +12,7 @@ pipeline {
         AWS_CREDENTIALS_ID = 'aws_credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
         AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
-        CREDENTIALS_Id = 'github_ssh_key'
+        CREDENTIALS_ID = 'github_ssh_key'
         BRANCH_NAME = 'master'
         REPO_NAME = 'test'
         ENV_URL = "git@github.com:Akhil0907/${REPO_NAME}.git"
@@ -21,7 +21,7 @@ pipeline {
    stages {
         stage('Checkout') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'CREDENTIALS_Id', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'CREDENTIALS_ID', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     sh "GIT_SSH_COMMAND=\"ssh -i \\\"$SSH_KEY\\\"\" git clone --depth=1 --branch ${BRANCH_NAME} ${ENV_URL}"
                     '''
