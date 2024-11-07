@@ -1,3 +1,13 @@
+// Declare variables as Groovy string variables
+String awsRegion = 'us-east-1'
+String awsCredentialsId = 'aws_credentials' // Replace with your actual credentials ID
+String awsCredentialsFile = 'aws_credentials.json' // Path to the file in the Jenkins workspace
+String awsCliDir = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
+String credentialsId = 'github_ssh_key'
+String branchName = 'master'
+String repoName = 'test'
+String envUrl = "git@github.com:Akhil0907/${repoName}.git"
+
 pipeline {
     agent any
 
@@ -5,25 +15,13 @@ pipeline {
         terraform 'terraform 1.9.8' // Ensure this version is configured in Jenkins
     }
 
-    environment {
-        AWS_REGION = 'us-east-1'
-        AWS_CREDENTIALS_ID = 'aws_credentials' // Replace with your actual credentials ID
-        AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
-        AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
-        PATH = "${env.AWS_CLI_DIR}/v2/current/bin:${env.PATH}" // Add AWS CLI to PATH
-        CREDENTIALS_ID = 'github_ssh_key'
-        BRANCH_NAME = 'master'
-        REPO_NAME = 'test'
-        ENV_URL = "git@github.com:Akhil0907/${REPO_NAME}.git"
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: "${CREDENTIALS_ID}", keyFileVariable: 'SSH_KEY')]) {
-                    sh '''
-                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git clone --depth=1 --branch ${BRANCH_NAME} ${ENV_URL}
-                    '''
+                withCredentials([sshUserPrivateKey(credentialsId: credentialsId, keyFileVariable: 'SSH_KEY')]) {
+                    sh """
+                    GIT_SSH_COMMAND="ssh -i \$SSH_KEY -o StrictHostKeyChecking=no" git clone --depth=1 --branch ${branchName} ${envUrl}
+                    """
                 }
             }
         }
@@ -39,23 +37,23 @@ pipeline {
         stage('Install AWS CLI') {
             steps {
                 // Install AWS CLI
-                sh '''
+                sh """
                 if ! command -v aws &> /dev/null
                 then
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                     unzip awscliv2.zip
-                    ./aws/install -i ${AWS_CLI_DIR} -b ${AWS_CLI_DIR}/bin
+                    ./aws/install -i ${awsCliDir} -b ${awsCliDir}/bin
                 fi
-                '''
+                """
             }
         }
 
         stage('List DynamoDB Tables') {
             steps {
-                withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
+                withCredentials([file(credentialsId: awsCredentialsId, variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
                         // Read AWS credentials from the JSON file using readJSON step
-                        def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
+                        def awsCredentials = readJSON file: awsCredentialsFile
                         def accessKeyId = awsCredentials.AccessKeyId
                         def secretAccessKey = awsCredentials.SecretAccessKey
                         def sessionToken = awsCredentials.SessionToken
@@ -66,27 +64,27 @@ pipeline {
                             "AWS_SESSION_TOKEN=${sessionToken}"
                         ]) {
                             // List DynamoDB tables to verify AWS and Jenkins connection
-                            sh '''
-                            aws dynamodb list-tables --region $AWS_REGION
-                            '''
+                            sh """
+                            aws dynamodb list-tables --region ${awsRegion}
+                            """
                         }
                     }
                 }
             }
         }
-    }
-        /*stage('Restore DynamoDB Table') {
+
+        stage('Restore DynamoDB Table') {
             steps {
                 script {
                     // Restore the DynamoDB table to a specific point in time
-                    sh '''
+                    sh """
                     aws dynamodb restore-table-to-point-in-time \
                     --source-table-name sandbox-poc-akhil-bkp-1 \
                     --target-table-name sandbox-poc-akhil-bkp-2 \
                     --no-use-latest-restorable-time \
                     --restore-date-time 729755290.56 \
-                    --region $AWS_REGION
-                    '''
+                    --region ${awsRegion}
+                    """
                 }
             }
         }
@@ -95,11 +93,11 @@ pipeline {
             steps {
                 script {
                     // Wait for the restored table to exist
-                    sh '''
+                    sh """
                     aws dynamodb wait table-exists \
                     --table-name 'sandbox-poc-akhil-bkp-1' \
-                    --region $AWS_REGION
-                    '''
+                    --region ${awsRegion}
+                    """
                 }
             }
         }
@@ -146,7 +144,7 @@ pipeline {
             }
         }
     }
-*/
+
     post {
         always {
             // Clean up workspace
