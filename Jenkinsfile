@@ -54,21 +54,23 @@ pipeline {
          
 stage('List DynamoDB Tables') {
     steps {
-        withCredentials([string(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_JSON')]) {
+        withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
             script {
-                // Read AWS credentials from the JSON string
-                def awsCredentials = new groovy.json.JsonSlurper().parseText(AWS_CREDENTIALS_JSON)
+                // Read AWS credentials from the JSON file using readJSON step
+                def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
                 def accessKeyId = awsCredentials.AccessKeyId
                 def secretAccessKey = awsCredentials.SecretAccessKey
                 def sessionToken = awsCredentials.SessionToken
+
                 withEnv([
-                    "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
-                    "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
-                    "AWS_SESSION_TOKEN=${awsCredentials.SessionToken}"
+                    "AWS_ACCESS_KEY_ID=${accessKeyId}",
+                    "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
+                    "AWS_SESSION_TOKEN=${sessionToken}"
                 ]) {
-                    echo "AWS_ACCESS_KEY_ID: ${env.AWS_ACCESS_KEY_ID}"
-                    echo "AWS_SECRET_ACCESS_KEY: ${env.AWS_SECRET_ACCESS_KEY}"
-                    echo "AWS_SESSION_TOKEN: ${env.AWS_SESSION_TOKEN}"
+                    // Print the values of the environment variables for debugging
+                    echo "AWS_ACCESS_KEY_ID: ${accessKeyId}"
+                    echo "AWS_SECRET_ACCESS_KEY: ${secretAccessKey}"
+                    echo "AWS_SESSION_TOKEN: ${sessionToken}"
                     // List DynamoDB tables to verify AWS and Jenkins connection
                  
                 }
