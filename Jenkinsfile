@@ -1,5 +1,4 @@
 // Declare variables as Groovy string variables
-String awsRegion = 'us-east-1'
 String awsCredentialsId = 'aws_credentials' // Replace with your actual credentials ID
 String awsCredentialsFile = 'aws_credentials.json' // Path to the file in the Jenkins workspace
 String credentialsId = 'github_ssh_key'
@@ -66,28 +65,26 @@ pipeline {
             }
         }*/
 
-        stage('List DynamoDB Tables') {
+       stage('Read AWS Credentials') {
             steps {
-                withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
+                withCredentials([file(credentialsId: awsCredentialsId, variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
                         // Read AWS credentials from the JSON file using readJSON step
                         def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
-                        def accessKeyId = awsCredentials.AccessKeyId
-                        def secretAccessKey = awsCredentials.SecretAccessKey
-                        def sessionToken = awsCredentials.SessionToken
-
-                        withEnv([
-                            "AWS_ACCESS_KEY_ID=${accessKeyId}",
-                            "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
-                            "AWS_SESSION_TOKEN=${sessionToken}"
-                            "AWS_REGION=${awsRegion}"
-                        ]) {
-                            // List DynamoDB tables to verify AWS and Jenkins connection
-                            sh '''
-                            aws dynamodb list-tables --region $AWS_REGION
-                            '''
-                        }
+                        env.AWS_ACCESS_KEY_ID = awsCredentials.AccessKeyId
+                        env.AWS_SECRET_ACCESS_KEY = awsCredentials.SecretAccessKey
+                        env.AWS_SESSION_TOKEN = awsCredentials.SessionToken
                     }
+                }
+            }
+        }
+
+        stage('List DynamoDB Tables') {
+            steps {
+                withAWS(region: awsRegion, credentials: awsCredentialsId) {
+                    sh '''
+                    aws dynamodb list-tables --region $AWS_REGION
+                    '''
                 }
             }
         }
