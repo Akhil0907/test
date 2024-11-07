@@ -50,7 +50,7 @@ pipeline {
         
       stage('Read AWS Credentials') {
             steps {
-                withCredentials([string(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
+                withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
                         // Read AWS credentials from the JSON string
                         def awsCredentials = readJSON text: AWS_CREDENTIALS_FILE
