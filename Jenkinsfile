@@ -1,4 +1,4 @@
-String gitEnvRepoCredentialsId = 'github-ssh-key'
+String gitEnvRepoCredentialsId = 'github_ssh_key'
 String gitEnvDevBranchName = 'master'
 String gitEnvRepoName = 'test'
 String gitEnvUrl = "git@github.com:Akhil0907/${gitEnvRepoName}.git"
