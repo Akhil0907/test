@@ -53,7 +53,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
                         // Read AWS credentials from the JSON string
-                        def awsCredentials = readJSON text: AWS_CREDENTIALS_FILE
+                        def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
                         env.AWS_ACCESS_KEY_ID = awsCredentials.AccessKeyId
                         env.AWS_SECRET_ACCESS_KEY = awsCredentials.SecretAccessKey
                         env.AWS_SESSION_TOKEN = awsCredentials.SessionToken
