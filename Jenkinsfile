@@ -65,7 +65,6 @@ pipeline {
         stage('List DynamoDB Tables') {
             steps {
                     script {
-                     {
                             // List DynamoDB tables to verify AWS and Jenkins connection
                             sh """
                             aws dynamodb list-tables --region ${awsRegion}
@@ -74,7 +73,6 @@ pipeline {
                     }
                 }
             }
-        }
     post {
         always {
             // Clean up workspace
