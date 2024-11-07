@@ -52,7 +52,7 @@ pipeline {
     }
 }
         
-      stage('Read AWS Credentials') {
+     /* stage('Read AWS Credentials') {
             steps {
                 withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
@@ -64,19 +64,33 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         stage('List DynamoDB Tables') {
             steps {
+                withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
                     script {
+                        // Read AWS credentials from the JSON file using readJSON step
+                        def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
+                        def accessKeyId = awsCredentials.AccessKeyId
+                        def secretAccessKey = awsCredentials.SecretAccessKey
+                        def sessionToken = awsCredentials.SessionToken
+
+                        withEnv([
+                            "AWS_ACCESS_KEY_ID=${accessKeyId}",
+                            "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
+                            "AWS_SESSION_TOKEN=${sessionToken}"
+                        ]) {
                             // List DynamoDB tables to verify AWS and Jenkins connection
-                            sh """
-                            aws dynamodb list-tables --region ${awsRegion}
-                            """
+                            sh '''
+                            aws dynamodb list-tables --region $AWS_REGION
+                            '''
                         }
                     }
                 }
             }
+        }
+    }
     post {
         always {
             // Clean up workspace
