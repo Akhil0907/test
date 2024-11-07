@@ -58,6 +58,9 @@ stage('List DynamoDB Tables') {
             script {
                 // Read AWS credentials from the JSON string
                 def awsCredentials = new groovy.json.JsonSlurper().parseText(AWS_CREDENTIALS_JSON)
+                def accessKeyId = awsCredentials.AccessKeyId
+                def secretAccessKey = awsCredentials.SecretAccessKey
+                def sessionToken = awsCredentials.SessionToken
                 withEnv([
                     "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
                     "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
