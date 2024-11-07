@@ -54,10 +54,10 @@ pipeline {
          
 stage('List DynamoDB Tables') {
     steps {
-        withCredentials([string(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_JSON')]) {
+        withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
             script {
-                // Read AWS credentials from the JSON string
-                def awsCredentials = readJSON text: AWS_CREDENTIALS_JSON
+                // Read AWS credentials from the JSON file
+                def awsCredentials = new groovy.json.JsonSlurper().parseText(readFile(file: AWS_CREDENTIALS_FILE))
                 withEnv([
                     "AWS_ACCESS_KEY_ID=${awsCredentials.AccessKeyId}",
                     "AWS_SECRET_ACCESS_KEY=${awsCredentials.SecretAccessKey}",
