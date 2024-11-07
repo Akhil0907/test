@@ -72,6 +72,9 @@ stage('List DynamoDB Tables') {
                     echo "AWS_SECRET_ACCESS_KEY: ${secretAccessKey}"
                     echo "AWS_SESSION_TOKEN: ${sessionToken}"
                     // List DynamoDB tables to verify AWS and Jenkins connection
+                    sh '''
+                    aws dynamodb list-tables --region $AWS_REGION
+                    '''
                  
                 }
             }
