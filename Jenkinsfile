@@ -12,10 +12,6 @@ pipeline {
     }
 
     environment {
-        GIT_REPO_URL = 'github.com/Akhil0907/test.git'
-        GIT_BRANCH = 'master'
-        GIT_CREDENTIALS_ID = 'auth_token' // Replace with your actual credentials ID
-        MFA_PROFILE = 'akhil-mfa' // Replace with your actual AWS profile
         AWS_REGION = 'us-east-1'
         AWS_CREDENTIALS_ID = 'aws_credentials' // Replace with your actual credentials ID
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
@@ -29,7 +25,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'gitEnvRepoCredentialsId', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git clone --depth=1 --branch ${GIT_BRANCH} git@${GIT_REPO_URL}
+                    sh "GIT_SSH_COMMAND=\"ssh -i \\\"$SSH_KEY\\\"\" git clone --depth=1 --branch ${gitEnvDevBranchName} ${gitEnvUrl}"
                     '''
                 }
             }
