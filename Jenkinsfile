@@ -34,20 +34,24 @@ pipeline {
             }
         }
 
-        stage('Install AWS CLI') {
-            steps {
+      stage('Install AWS CLI') {
+         steps {
+             script {
+                 // Set the AWS CLI directory
+                 def awsCliDir = "${env.WORKSPACE}/aws-cli"
+
                 // Install AWS CLI
-                sh """
+                 sh """
                 if ! command -v aws &> /dev/null
-                then
-                    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                    unzip awscliv2.zip
-                    awsCliDir = "${env.WORKSPACE}/aws-cli"
-                    ./aws/install -i ${awsCliDir} -b ${awsCliDir}/bin
-                fi
-                """
-            }
+               then
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                ./aws/install -i ${awsCliDir} -b ${awsCliDir}/bin
+            fi
+            """
         }
+    }
+}
         
       stage('Read AWS Credentials') {
             steps {
