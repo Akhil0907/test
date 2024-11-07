@@ -1,5 +1,10 @@
+String gitEnvRepoCredentialsId = 'github-ssh-key'
+String gitEnvDevBranchName = 'master'
+String gitEnvRepoName = 'test'
+String gitEnvUrl = "git@github.com:Akhil0907/${gitEnvRepoName}.git"
 
 pipeline {
+    
     agent any
 
     tools {
@@ -16,15 +21,16 @@ pipeline {
         AWS_CREDENTIALS_FILE = 'aws_credentials.json' // Path to the file in the Jenkins workspace
         AWS_CLI_DIR = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
         PATH = "${env.AWS_CLI_DIR}/v2/current/bin:${env.PATH}" // Add AWS CLI to PATH
+        
     }
 
     stages {
         stage('Checkout') {
             steps {
-                withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    sh '''
-                    git clone --branch $GIT_BRANCH https://$GIT_USERNAME:$GIT_PASSWORD@$GIT_REPO_URL
-                    '''
+                withCredentials([sshUserPrivateKey(credentialsId: gitEnvRepoCredentialsId, keyFileVariable: 'SSH_KEY')]) {
+             
+                    sh "GIT_SSH_COMMAND=\"ssh -i \\\"$SSH_KEY\\\"\" git clone --depth=1 --branch ${gitEnvDevBranchName} ${gitEnvUrl}"
+                
                 }
             }
         }
