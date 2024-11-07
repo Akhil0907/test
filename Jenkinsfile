@@ -24,13 +24,13 @@ pipeline {
         
     }
 
-    stages {
+   stages {
         stage('Checkout') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: gitEnvRepoCredentialsId, keyFileVariable: 'SSH_KEY')]) {
-             
-                    sh "GIT_SSH_COMMAND=\"ssh -i \\\"$SSH_KEY\\\"\" git clone --depth=1 --branch ${gitEnvDevBranchName} ${gitEnvUrl}"
-                
+                withCredentials([sshUserPrivateKey(credentialsId: 'gitEnvRepoCredentialsId', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git clone --depth=1 --branch ${GIT_BRANCH} git@${GIT_REPO_URL}
+                    '''
                 }
             }
         }
