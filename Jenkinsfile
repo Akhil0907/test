@@ -18,16 +18,15 @@ pipeline {
         ENV_URL = "git@github.com:Akhil0907/${REPO_NAME}.git"
     }
 
-   stages {
+  stages {
         stage('Checkout') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'CREDENTIALS_ID', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: "${CREDENTIALS_ID}", keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    sh "GIT_SSH_COMMAND=\"ssh -i \\\"$SSH_KEY\\\"\" git clone --depth=1 --branch ${BRANCH_NAME} ${ENV_URL}"
+                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git clone --depth=1 --branch ${BRANCH_NAME} ${ENV_URL}
                     '''
                 }
             }
-        }
         
        stage('Terraform Init') {
             steps {
