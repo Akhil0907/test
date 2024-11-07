@@ -66,10 +66,6 @@ stage('List DynamoDB Tables') {
                     "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
                     "AWS_SESSION_TOKEN=${sessionToken}"
                 ]) {
-                    // Print the values of the environment variables for debugging
-                    echo "AWS_ACCESS_KEY_ID: ${accessKeyId}"
-                    echo "AWS_SECRET_ACCESS_KEY: ${secretAccessKey}"
-                    echo "AWS_SESSION_TOKEN: ${sessionToken}"
                     // List DynamoDB tables to verify AWS and Jenkins connection
                     sh '''
                     aws dynamodb list-tables --region $AWS_REGION
@@ -81,6 +77,7 @@ stage('List DynamoDB Tables') {
     }
 }
     }
+  }
        /* stage('Restore DynamoDB Table') {
             steps {
                 // Restore the DynamoDB table to a specific point in time
