@@ -1,6 +1,4 @@
-
 pipeline {
-    
     agent any
 
     tools {
@@ -18,7 +16,7 @@ pipeline {
         ENV_URL = "git@github.com:Akhil0907/${REPO_NAME}.git"
     }
 
-  stages {
+    stages {
         stage('Checkout') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: "${CREDENTIALS_ID}", keyFileVariable: 'SSH_KEY')]) {
@@ -27,8 +25,9 @@ pipeline {
                     '''
                 }
             }
-        
-       stage('Terraform Init') {
+        }
+
+        stage('Terraform Init') {
             steps {
                 script {
                     sh 'terraform init'
@@ -36,7 +35,6 @@ pipeline {
             }
         }
 
-        
         stage('Install AWS CLI') {
             steps {
                 // Install AWS CLI
@@ -50,42 +48,36 @@ pipeline {
                 '''
             }
         }
-         
-stage('List DynamoDB Tables') {
-    steps {
-        withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
-            script {
-                // Read AWS credentials from the JSON file using readJSON step
-                def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
-                def accessKeyId = awsCredentials.AccessKeyId
-                def secretAccessKey = awsCredentials.SecretAccessKey
-                def sessionToken = awsCredentials.SessionToken
 
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${accessKeyId}",
-                    "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
-                    "AWS_SESSION_TOKEN=${sessionToken}"
-                ]) {
-                    // List DynamoDB tables to verify AWS and Jenkins connection
-                    sh '''
-                    aws dynamodb list-tables --region $AWS_REGION
-                    '''
-                 
+        stage('List DynamoDB Tables') {
+            steps {
+                withCredentials([file(credentialsId: 'aws_credentials', variable: 'AWS_CREDENTIALS_FILE')]) {
+                    script {
+                        // Read AWS credentials from the JSON file using readJSON step
+                        def awsCredentials = readJSON file: AWS_CREDENTIALS_FILE
+                        def accessKeyId = awsCredentials.AccessKeyId
+                        def secretAccessKey = awsCredentials.SecretAccessKey
+                        def sessionToken = awsCredentials.SessionToken
+
+                        withEnv([
+                            "AWS_ACCESS_KEY_ID=${accessKeyId}",
+                            "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
+                            "AWS_SESSION_TOKEN=${sessionToken}"
+                        ]) {
+                            // List DynamoDB tables to verify AWS and Jenkins connection
+                            sh '''
+                            aws dynamodb list-tables --region $AWS_REGION
+                            '''
+                        }
+                    }
                 }
             }
         }
     }
-}
-    }
-  }
-       /* stage('Restore DynamoDB Table') {
+        /*stage('Restore DynamoDB Table') {
             steps {
-                // Restore the DynamoDB table to a specific point in time
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
+                script {
+                    // Restore the DynamoDB table to a specific point in time
                     sh '''
                     aws dynamodb restore-table-to-point-in-time \
                     --source-table-name sandbox-poc-akhil-bkp-1 \
@@ -100,12 +92,8 @@ stage('List DynamoDB Tables') {
 
         stage('Wait for table to be created') {
             steps {
-                // Wait for the restored table to exist
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
+                script {
+                    // Wait for the restored table to exist
                     sh '''
                     aws dynamodb wait table-exists \
                     --table-name 'sandbox-poc-akhil-bkp-1' \
@@ -117,17 +105,11 @@ stage('List DynamoDB Tables') {
 
         stage('Terraform State Management') {
             steps {
-                // Remove all resources from the Terraform state
                 script {
-                    withEnv([
-                        "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                        "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                        "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                    ]) {
-                        def resources = sh(script: 'terraform state list', returnStdout: true).trim().split('\n')
-                        for (resource in resources) {
-                            sh "terraform state rm ${resource}"
-                        }
+                    // Remove all resources from the Terraform state
+                    def resources = sh(script: 'terraform state list', returnStdout: true).trim().split('\n')
+                    for (resource in resources) {
+                        sh "terraform state rm ${resource}"
                     }
                 }
             }
@@ -135,12 +117,8 @@ stage('List DynamoDB Tables') {
 
         stage('Terraform Import') {
             steps {
-                // Import the existing DynamoDB table
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
+                script {
+                    // Import the existing DynamoDB table
                     sh 'terraform import aws_dynamodb_table.content backup_table_4'
                 }
             }
@@ -148,17 +126,11 @@ stage('List DynamoDB Tables') {
 
         stage('Terraform Plan') {
             steps {
-                // Plan the Terraform changes
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
-                    script {
-                        def output = sh(script: 'terraform output -json', returnStdout: true).trim()
-                        def json = readJSON text: output
-                        env.TABLE_NAME = json.dynamodb_table_name.value
-                    }
+                script {
+                    // Plan the Terraform changes
+                    def output = sh(script: 'terraform output -json', returnStdout: true).trim()
+                    def json = readJSON text: output
+                    env.TABLE_NAME = json.dynamodb_table_name.value
                     sh "terraform plan -var='table_name=${env.TABLE_NAME}'"
                 }
             }
@@ -166,18 +138,14 @@ stage('List DynamoDB Tables') {
 
         stage('Terraform Apply') {
             steps {
-                // Apply the Terraform changes
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}",
-                    "AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}",
-                    "AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"
-                ]) {
+                script {
+                    // Apply the Terraform changes
                     sh "terraform apply -var='table_name=${env.TABLE_NAME}' -auto-approve"
                 }
             }
         }
-    }*/
-
+    }
+*/
     post {
         always {
             // Clean up workspace
