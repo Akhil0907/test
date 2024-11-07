@@ -72,79 +72,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Restore DynamoDB Table') {
-            steps {
-                script {
-                    // Restore the DynamoDB table to a specific point in time
-                    sh """
-                    aws dynamodb restore-table-to-point-in-time \
-                    --source-table-name sandbox-poc-akhil-bkp-1 \
-                    --target-table-name sandbox-poc-akhil-bkp-2 \
-                    --no-use-latest-restorable-time \
-                    --restore-date-time 729755290.56 \
-                    --region ${awsRegion}
-                    """
-                }
-            }
-        }
-
-        stage('Wait for table to be created') {
-            steps {
-                script {
-                    // Wait for the restored table to exist
-                    sh """
-                    aws dynamodb wait table-exists \
-                    --table-name 'sandbox-poc-akhil-bkp-1' \
-                    --region ${awsRegion}
-                    """
-                }
-            }
-        }
-
-        stage('Terraform State Management') {
-            steps {
-                script {
-                    // Remove all resources from the Terraform state
-                    def resources = sh(script: 'terraform state list', returnStdout: true).trim().split('\n')
-                    for (resource in resources) {
-                        sh "terraform state rm ${resource}"
-                    }
-                }
-            }
-        }
-
-        stage('Terraform Import') {
-            steps {
-                script {
-                    // Import the existing DynamoDB table
-                    sh 'terraform import aws_dynamodb_table.content backup_table_4'
-                }
-            }
-        }
-
-        stage('Terraform Plan') {
-            steps {
-                script {
-                    // Plan the Terraform changes
-                    def output = sh(script: 'terraform output -json', returnStdout: true).trim()
-                    def json = readJSON text: output
-                    env.TABLE_NAME = json.dynamodb_table_name.value
-                    sh "terraform plan -var='table_name=${env.TABLE_NAME}'"
-                }
-            }
-        }
-
-        stage('Terraform Apply') {
-            steps {
-                script {
-                    // Apply the Terraform changes
-                    sh "terraform apply -var='table_name=${env.TABLE_NAME}' -auto-approve"
-                }
-            }
-        }
     }
-
     post {
         always {
             // Clean up workspace
