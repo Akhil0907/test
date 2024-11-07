@@ -80,10 +80,11 @@ pipeline {
                             "AWS_ACCESS_KEY_ID=${accessKeyId}",
                             "AWS_SECRET_ACCESS_KEY=${secretAccessKey}",
                             "AWS_SESSION_TOKEN=${sessionToken}"
+                            "AWS_REGION=${awsRegion}"
                         ]) {
                             // List DynamoDB tables to verify AWS and Jenkins connection
                             sh '''
-                            aws dynamodb list-tables --region ${awsRegion}
+                            aws dynamodb list-tables --region $AWS_REGION
                             '''
                         }
                     }
