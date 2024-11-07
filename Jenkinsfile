@@ -2,7 +2,7 @@
 String awsRegion = 'us-east-1'
 String awsCredentialsId = 'aws_credentials' // Replace with your actual credentials ID
 String awsCredentialsFile = 'aws_credentials.json' // Path to the file in the Jenkins workspace
-String awsCliDir = "${env.WORKSPACE}/aws-cli" // Custom installation directory for AWS CLI
+String awsCliDir // Custom installation directory for AWS CLI
 String credentialsId = 'github_ssh_key'
 String branchName = 'master'
 String repoName = 'test'
@@ -42,6 +42,7 @@ pipeline {
                 then
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                     unzip awscliv2.zip
+                    awsCliDir = "${env.WORKSPACE}/aws-cli"
                     ./aws/install -i ${awsCliDir} -b ${awsCliDir}/bin
                 fi
                 """
